@@ -1,0 +1,146 @@
+import 'dart:io';
+
+List<Map<String, dynamic>> listaLibros = [];
+
+void main() {
+  while (true) {
+    stdout.writeln('\nElige una opción:');
+    stdout.writeln('1. Agregar libro');
+    stdout.writeln('2. Eliminar libro');
+    stdout.writeln('3. Actualizar libro');
+    stdout.writeln('4. Listar libros');
+    stdout.writeln('5. Salir');
+    stdout.write('> ');
+
+    final input = stdin.readLineSync();
+    final opcion = int.tryParse(input ?? '');
+
+    if (opcion == null) {
+      stdout.writeln('Error: entrada no es un número válido.');
+      continue;
+    }
+
+    switch (opcion) {
+      case 1:
+        agregarLibro();
+        break;
+      case 2:
+        eliminarLibro();
+        break;
+      case 3:
+        actualizarLibro();
+        break;
+      case 4:
+        listarLibros();
+        break;
+      case 5:
+        stdout.writeln('Saliendo del programa. ¡Hasta luego!');
+        return;
+      default:
+        stdout.writeln('Opción no válida. Intenta de nuevo.');
+    }
+  }
+}
+
+void agregarLibro() {
+  stdout.write('Título del libro: ');
+  final titulo = stdin.readLineSync();
+  if (titulo == null || titulo.trim().isEmpty) {
+    stdout.writeln('Error: título no puede estar vacío.');
+    return;
+  }
+
+  stdout.write('Autor del libro: ');
+  final autor = stdin.readLineSync();
+  if (autor == null || autor.trim().isEmpty) {
+    stdout.writeln('Error: autor no puede estar vacío.');
+    return;
+  }
+
+  stdout.write('Año de publicación: ');
+  final anioInput = stdin.readLineSync();
+  final anio = int.tryParse(anioInput ?? '');
+  if (anio == null || anio <= 0) {
+    stdout.writeln('Error: año inválido.');
+    return;
+  }
+
+  listaLibros.add({'titulo': titulo.trim(), 'autor': autor.trim(), 'anio': anio});
+  stdout.writeln('Libro agregado exitosamente.');
+}
+
+void eliminarLibro() {
+  if (listaLibros.isEmpty) {
+    stdout.writeln('No hay libros para eliminar.');
+    return;
+  }
+
+  listarLibros();
+  stdout.write('Ingresa el índice del libro a eliminar (1–${listaLibros.length}): ');
+  final input = stdin.readLineSync();
+  final idx = int.tryParse(input ?? '');
+
+  if (idx == null || idx < 1 || idx > listaLibros.length) {
+    stdout.writeln('Error: índice fuera de rango.');
+    return;
+  }
+
+  final libro = listaLibros.removeAt(idx - 1);
+  stdout.writeln('Libro eliminado: "${libro['titulo']}".');
+}
+
+void actualizarLibro() {
+  if (listaLibros.isEmpty) {
+    stdout.writeln('No hay libros para actualizar.');
+    return;
+  }
+
+  listarLibros();
+  stdout.write('Ingresa el índice del libro a actualizar (1–${listaLibros.length}): ');
+  final input = stdin.readLineSync();
+  final idx = int.tryParse(input ?? '');
+
+  if (idx == null || idx < 1 || idx > listaLibros.length) {
+    stdout.writeln('Error: índice fuera de rango.');
+    return;
+  }
+
+  final libro = listaLibros[idx - 1];
+
+  stdout.write('Nuevo título (presiona Enter para dejar: "${libro['titulo']}"): ');
+  final nuevoTitulo = stdin.readLineSync();
+  if (nuevoTitulo != null && nuevoTitulo.trim().isNotEmpty) {
+    libro['titulo'] = nuevoTitulo.trim();
+  }
+
+  stdout.write('Nuevo autor (presiona Enter para dejar: "${libro['autor']}"): ');
+  final nuevoAutor = stdin.readLineSync();
+  if (nuevoAutor != null && nuevoAutor.trim().isNotEmpty) {
+    libro['autor'] = nuevoAutor.trim();
+  }
+
+  stdout.write('Nuevo año (presiona Enter para dejar: "${libro['anio']}"): ');
+  final nuevoAnioInput = stdin.readLineSync();
+  if (nuevoAnioInput != null && nuevoAnioInput.trim().isNotEmpty) {
+    final nuevoAnio = int.tryParse(nuevoAnioInput);
+    if (nuevoAnio == null || nuevoAnio <= 0) {
+      stdout.writeln('Error: año inválido. Se mantiene el año anterior.');
+    } else {
+      libro['anio'] = nuevoAnio;
+    }
+  }
+
+  stdout.writeln('Libro actualizado correctamente.');
+}
+
+void listarLibros() {
+  if (listaLibros.isEmpty) {
+    stdout.writeln('No hay libros registrados.');
+  } else {
+    stdout.writeln('\nLibros:');
+    for (var i = 0; i < listaLibros.length; i++) {
+      final l = listaLibros[i];
+      stdout.writeln('${i + 1}. "${l['titulo']}" — ${l['autor']} (${l['anio']})');
+    }
+  }
+}
